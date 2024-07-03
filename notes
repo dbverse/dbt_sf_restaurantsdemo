@@ -1,1 +1,31 @@
+dbt cloud by default has only one target schema where all models (tables/views) would be created. But dbt core has felxible schema configurations.
+To overcome this in dbt cloud - where you need to create two tables from raw to stage and then create a view in core from stage tables:
+1. Add a macro as below with name generate_schema_name.sql in macros folder. Look at the else part carefully and tweak if needed
+{% macro generate_schema_name(custom_schema_name, node) -%}
 
+    {%- set default_schema = target.schema -%}
+    {%- if custom_schema_name is none -%}
+
+        {{ default_schema }}
+
+    {%- else -%}
+
+        {{ custom_schema_name | trim }}
+
+    {%- endif -%}
+
+{%- endmacro %}
+2. Explicitly mention schema using config inside the model and also mention the same in the dbt_project.yml
+(in the model)
+{{ config(
+    schema = 'core'
+) }}
+select a.author_name as author, b.title as book
+from {{ ref("authors") }} a
+join {{ ref("books") }} b on a.author_id = b.author_id
+
+(in dbt_prokect.yml)
+models:
+    core:
+      materialized: view
+      schema: core

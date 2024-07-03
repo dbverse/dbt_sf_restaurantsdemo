@@ -25,6 +25,10 @@ from {{ ref("authors") }} a
 join {{ ref("books") }} b on a.author_id = b.author_id
 
 (in dbt_prokect.yml)
+
+-> If a column is not mentioned in the properties.yml(schema.yml), but if we do a select * inside the model, the column is created in the resulting view/table.
+   This means that the columns in the properties.yml are mainly for tests, constraints. 
+   Its not mandatory to put all columns in this .yml to get them into the view/table.
 models:
     core:
       materialized: view

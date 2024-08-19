@@ -1,0 +1,30 @@
+version: 2
+
+sources:
+  - name: raw
+    database: demo
+    schema: raw
+    tables:
+      - name: restaurants
+      - name: cuisine  
+        freshness:
+          warn_after: { count: 5, period: minute } 
+      - name: orders      
+      - name: item_costs
+      - name: order_details  
+      - name: customers
+
+models:
+  - name: dim_restaurants
+    columns:
+      - name: restaurant_id
+        description: Unique identifier for each restaurant.
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: source('raw', 'cuisine')
+              field: restaurant_id
+      - name: city
+        description: City Name.
+
